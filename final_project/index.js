@@ -3,11 +3,58 @@ const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const customer_routes = require("./router/auth_users.js").authenticated;
 const genl_routes = require("./router/general.js").general;
+const axios = require("axios");
 
 const app = express();
 
 app.use(express.json());
 
+async function getAllBooks() {
+  try {
+    const response = await axios.get("http://localhost:5000/");
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+async function getBookByISBN(isbn) {
+  try {
+    const response = await axios.get(`http://localhost:5000/isbn/${isbn}`);
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+async function getBooksByAuthor(author) {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/author/${encodeURIComponent(author)}`,
+    );
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+async function getBooksByTitle(title) {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/title/${encodeURIComponent(title)}`,
+    );
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
+}
 app.use(
   "/customer",
   session({
@@ -18,6 +65,11 @@ app.use(
 );
 
 app.use("/customer/auth/*", function auth(req, res, next) {
+  if (!req.session.authorization) {
+    return res.status(401).json({
+      message: "User not logged in",
+    });
+  }
   if (req.session.authorization) {
     let token = req.session.authorization["accessToken"];
 
@@ -30,8 +82,6 @@ app.use("/customer/auth/*", function auth(req, res, next) {
       req.user = user;
       next();
     });
-  } else {
-    return res.status(300).json({ message: "user not register yet" });
   }
 });
 

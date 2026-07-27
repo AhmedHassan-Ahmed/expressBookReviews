@@ -17,13 +17,14 @@ const authenticatedUser = (username, password) => {
 
 //only registered users can login
 regd_users.post("/login", (req, res) => {
-  const user = req.body.user;
-  if (!authenticatedUser(user.username, user.pass)) {
+  const username = req.body.username;
+  const password = req.body.password;
+  if (!authenticatedUser(username, password)) {
     return res.status(401).json({
       message: "Invalid username or password",
     });
   }
-  if (!user) {
+  if (!username || !password) {
     return res.status(404).json({ message: "Body Empty" });
   }
   let accessToken = jwt.sign({ data: req.body.user }, "access", {
@@ -41,7 +42,7 @@ regd_users.get("/user/profile", (req, res) => {
 regd_users.put("/auth/review/:isbn", (req, res) => {
 const isbn = req.params.isbn;
   const review = req.body.review;
-  const username = req.user.data.username;
+  const username = req.user.username;
 
   if (!books[isbn]) {
     return res.status(404).json({
@@ -52,6 +53,29 @@ const isbn = req.params.isbn;
     return res.json({
     message: "Review added successfully",
     book: books[isbn]
+  });
+});
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+  const isbn = req.params.isbn;
+  const username = req.user.username;
+
+  if (!books[isbn]) {
+    return res.status(404).json({
+      message: "Book not found",
+    });
+  }
+
+  if (!books[isbn].reviews[username]) {
+    return res.status(404).json({
+      message: "Review not found",
+    });
+  }
+
+  delete books[isbn].reviews[username];
+
+  return res.status(200).json({
+    message: "Review successfully deleted",
   });
 });
 

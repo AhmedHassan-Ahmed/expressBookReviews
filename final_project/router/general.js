@@ -50,7 +50,7 @@ public_users.get("/isbn/:isbn", function (req, res) {
 public_users.get("/author/:author", function (req, res) {
   const author = req.params.author;
 
-  const result = Object.values(books).filter(
+  const result = Object.values(books).filter((book)=>
     book.author.toLowerCase() === author.toLowerCase(),
   );
 
@@ -61,9 +61,9 @@ public_users.get("/author/:author", function (req, res) {
 public_users.get("/title/:title", function (req, res) {
   const title = req.params.title;
 
-  const result = Object.values(books).filter(
-    (book) => book.title.toLowerCase() === title.toLowerCase(),
-  );
+  const result = Object.values(books).filter((book) => {
+    return book.author.toLowerCase() === author.toLowerCase();
+  });
 
   return res.status(200).json(result);
 });
