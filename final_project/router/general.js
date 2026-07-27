@@ -3,7 +3,56 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require("axios");
 
+async function getAllBooks() {
+  try {
+    const response = await axios.get("http://localhost:5000/");
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+async function getBookByISBN(isbn) {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/isbn/${isbn}`
+    );
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+async function getBooksByAuthor(author) {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/author/${encodeURIComponent(author)}`
+    );
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+async function getBooksByTitle(title) {
+  try {
+    const response = await axios.get(
+      `http://localhost:5000/title/${encodeURIComponent(title)}`
+    );
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error(error.message);
+  }
+}
 public_users.post("/register", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -62,7 +111,7 @@ public_users.get("/title/:title", function (req, res) {
   const title = req.params.title;
 
   const result = Object.values(books).filter((book) => {
-    return book.author.toLowerCase() === author.toLowerCase();
+    return book.title.toLowerCase() === title.toLowerCase();
   });
 
   return res.status(200).json(result);
